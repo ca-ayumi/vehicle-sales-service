@@ -1,0 +1,42 @@
+datasource db {
+ provider = "postgresql"
+ url      = env("DATABASE_URL")
+}
+
+generator client {
+ provider = "prisma-client-js"
+}
+
+enum SaleStatus {
+ PENDING
+ PAID
+ CANCELED
+}
+
+enum PaymentStatus {
+ CREATED
+ CONFIRMED
+ CANCELED
+}
+
+model Sale {
+ id            String   @id @default(uuid())
+ vehicleId     String
+ buyerCpf      String
+ priceSnapshot Decimal  @db.Decimal(10,2)
+ status        SaleStatus @default(PENDING)
+ payments      Payment[]
+ createdAt     DateTime @default(now())
+ updatedAt     DateTime @updatedAt
+}
+
+model Payment {
+ id            String         @id @default(uuid())
+ saleId        String
+ sale          Sale           @relation(fields: [saleId], references: [id])
+ paymentCode   String         @unique
+ status        PaymentStatus  @default(CREATED)
+ providerPayload Json?
+ createdAt     DateTime       @default(now())
+ updatedAt     DateTime       @updatedAt
+}
