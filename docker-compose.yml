@@ -1,0 +1,21 @@
+version: '3.9'
+services:
+  db_sales:
+    image: postgres:16
+    environment:
+      POSTGRES_PASSWORD: salespwd
+      POSTGRES_USER: sales
+      POSTGRES_DB: salesdb
+    ports:
+      - "5433:5432"
+
+  api:
+    build: .
+    env_file: .env
+    environment:
+      DATABASE_URL: postgresql://sales:salespwd@db_sales:5432/salesdb
+      CORE_BASE_URL: http://localhost:3002
+    ports:
+      - "3000:3000"
+    depends_on:
+      - db_sales

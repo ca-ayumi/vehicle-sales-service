@@ -1,0 +1,26 @@
+name: Deploy
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Build Docker image
+        run: |
+          docker build \
+            -t ghcr.io/ca-ayumi/vehicle-sales-service:latest \
+            -f docker/Dockerfile .
+
+      - name: Login to GHCR
+        run: echo "${{ secrets.GHCR_PAT1 }}" | docker login ghcr.io -u "ca-ayumi" --password-stdin
+
+      - name: Push image
+        run: docker push ghcr.io/ca-ayumi/vehicle-sales-service:latest
